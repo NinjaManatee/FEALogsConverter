@@ -3,7 +3,7 @@
 	// check the config.schema.json to se message examples for each log type
 	"FEALogRegexp": "(?s)^\\[(?<timestamp>.+?)\\] \\[(?<level>[^\\]]+)\\]: (?<message>.*)$",
 	"FEACentralLoggerRegexp": "(?s)^\\[(?<timestamp>.+?)\\] \\[(?<level>[^\\]]+)\\]: (?<message>Central Logger,.*)$",
-	"AssimilationRegexp": "\\[(?<timestamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3})\\] \\[\\w+\\] \\[(?<level>\\w+)\\] (?<message>.*)",
+	"AssimilationRegexp": "\\[(?<timestamp>.+?)\\] \\[\\w+\\] \\[(?<level>\\w+)\\] (?<message>.*)",
 	"NativeLogRegexp": "(?s)^(?<timestamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3} [\\+\\-]\\d{2}:\\d{2}) \\[(?<level>\\w+)\\] tid:\\d+ : (?<message>.*)$",
 	"LogLevelsAlternatives": {
 		"Error": [ "error", "err" ],
