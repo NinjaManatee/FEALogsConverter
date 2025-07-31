@@ -1,8 +1,8 @@
-﻿using System.IO.Compression;
+﻿using Json.Schema;
+using System.IO.Compression;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
-using Json.Schema;
 
 namespace FeaLogsConverter
 {
@@ -19,7 +19,7 @@ namespace FeaLogsConverter
 		private Dictionary<string, string> logLevelsMap;
 
 
-		public LogConverter(string folderPath = null)
+		public LogConverter(string? folderPath)
 		{
 			FolderPath = string.IsNullOrWhiteSpace(folderPath) ? Directory.GetCurrentDirectory() : folderPath;
 		}
@@ -56,7 +56,7 @@ namespace FeaLogsConverter
 				configText = Regex.Replace(configText, @"//.*", "");
 
 				JsonNode configNode = JsonNode.Parse(configText)
-									  ?? throw new InvalidOperationException("Invalid JSON");
+					?? throw new InvalidOperationException("Invalid JSON");
 
 				var result = schema.Evaluate(configNode);
 				if (result != null && !result.IsValid)
@@ -73,8 +73,8 @@ namespace FeaLogsConverter
 					return false;
 				}
 
-				Config = JsonSerializer.Deserialize<Config>(configText)
-						 ?? throw new InvalidOperationException("Deserialization failed");
+				Config = JsonSerializer.Deserialize<Config>(configText) 
+					?? throw new InvalidOperationException("Deserialization failed");
 
 				logLevelsMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 				foreach (var kvp in Config.LogLevelsAlternatives)
