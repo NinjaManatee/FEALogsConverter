@@ -127,16 +127,19 @@ namespace FeaLogsConverter
 
 		private void ReadLogFiles()
 		{
-			Console.WriteLine($"Reading .log files from: {FolderPath}");
+			Console.WriteLine($"Reading log files from: {FolderPath}");
 			string[] logFiles = Directory.GetFiles(FolderPath, "*.log")
 				.Concat(Directory.GetFiles(FolderPath, "assimilationLogs*.txt"))
 				.Concat(Directory.GetFiles(FolderPath, "*.log.*")
 				.Where(f => int.TryParse(Path.GetExtension(f).TrimStart('.'), out _))) // Ensures it's like ".1", ".2"
 				.ToArray();
 
+			Console.WriteLine($"Attempting to parse the following files: \n\t{string.Join("\n\t", logFiles)}");
+
 			foreach (var file in logFiles)
 			{
-				Console.WriteLine($"Processing: {file}");
+				var filename = Path.GetFileName(file);
+				Console.WriteLine($"Processing: {filename}");
 				try
 				{
 					string[] lines = File.ReadAllLines(file);
@@ -168,8 +171,8 @@ namespace FeaLogsConverter
 
 					if (recordSplitPattern == null)
 					{
-						Console.WriteLine($"Can not determine log record type by first line for: {file} file. The file will be ignored");
-						Console.WriteLine($"{firstLine}");
+						Console.WriteLine($"Can not determine log record type by first line for: {filename} file. The file will be ignored");
+						Console.WriteLine($"\t{firstLine}");
 						continue;
 					}
 
@@ -191,11 +194,11 @@ namespace FeaLogsConverter
 					isCentralLoggerRecord = isFeaLogs && Regex.IsMatch(currentRecord, Config.FEACentralLoggerRegexp);
 					MaybeSaveCurrentRecord(currentRecord, isCentralLoggerRecord, recordSplitPattern, clientName, isFeaLogs);
 
-					Console.WriteLine($"Loaded file: {Path.GetFileName(file)}");
+					Console.WriteLine($"Loaded file: {filename}");
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine($"Failed to read {file}: {ex.Message}");
+					Console.WriteLine($"Failed to read {filename}: {ex.Message}");
 				}
 
 				Console.WriteLine($"Total log records: {centralLogs.Count + otherLogs.Count + normalizedLogs.Count}");
