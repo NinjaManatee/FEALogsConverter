@@ -156,7 +156,7 @@ namespace FeaLogsConverter
 						else if (Regex.IsMatch(firstLine, Config.NativeLogRegexp))
 						{
 							recordSplitPattern = Config.NativeLogRegexp;
-							clientName = "Native";
+							clientName = Path.GetFileName(file);
 						}
 					}
 
