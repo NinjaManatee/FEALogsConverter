@@ -1,0 +1,16 @@
+{
+	// IMPORTANT: all regexp should contain alias <timestamp>, <level> and <message> to parse values correctly
+	// check the config.schema.json to se message examples for each log type
+	"FEALogRegexp": "(?s)^\\[(?<timestamp>.+?)\\] \\[(?<level>[^\\]]+)\\]: (?<message>.*)$",
+	"FEACentralLoggerRegexp": "(?s)^\\[(?<timestamp>.+?)\\] \\[(?<level>[^\\]]+)\\]: (?<message>Central Logger,.*)$",
+	"AssimilationRegexp": "\\[(?<timestamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3})\\] \\[\\w+\\] \\[(?<level>\\w+)\\] (?<message>.*)",
+	"NativeLogRegexp": "(?s)^(?<timestamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3} [\\+\\-]\\d{2}:\\d{2}) \\[(?<level>\\w+)\\] tid:\\d+ : (?<message>.*)$",
+	"LogLevelsAlternatives": {
+		"Error": [ "error", "err" ],
+		"Warn": [ "warn", "Warning", "wrn" ],
+		"Log": [ "log", "log-" ],
+		"Info": [ "inf", "info" ],
+		"Debug": [ "debug", "dbg" ],
+		"Verbose": [ "verbose" ]
+	}
+}

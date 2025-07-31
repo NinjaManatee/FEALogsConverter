@@ -1,0 +1,64 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"title": "Application Configuration",
+	"type": "object",
+	"properties": {
+		"FEALogRegexp": {
+			"type": "string",
+			"description": "The regulat expression to split FEA log records",
+			"examples": [
+				"[2025-05-01T11:06:59.344Z] [log-]: APPLICATION LIFECYCLE: System unlocked.",
+				"(?s)^\\[(?<timestamp>.+?)\\] \\[(?<level>[^\\]]+)\\]: (?<message>.*)$"
+			]
+		},
+		"FEACentralLoggerRegexp": {
+			"type": "string",
+			"description": "The regulat expression to split Central Logger log records in FEA log file",
+			"examples": [
+				"[2025-05-01T04:00:38.358Z] [error]: Central Logger,{\"category\": \"system\"......",
+				"(?s)^\\[(?<timestamp>.+?)\\] \\[(?<level>[^\\]]+)\\]: (?<message>Central Logger,.*)$"
+			]
+		},
+		"AssimilationRegexp": {
+			"type": "string",
+			"description": "The regulat expression to split Assimilation log records",
+			"examples": [
+				"[2025-06-04 13:43:28.509] [Assimilation] [debug] listenForWindows EVENT_OBJECT_DESTROY for HWND: 00740668 TITLE:",
+				"\\[(?<timestamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3})\\] \\[\\w+\\] \\[(?<level>\\w+)\\] (?<message>.*)"
+			]
+		},
+		"NativeLogRegexp": {
+			"description": "The regulat expression to split Native log records",
+			"examples": [
+				"2025-05-01 16:16:53.584 -04:00 [INF] tid:1 : Finsemble input arguments:",
+				"(?s)^(?<timestamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3} [\\+\\-]\\d{2}:\\d{2}) \\[(?<level>\\w+)\\] tid:\\d+ : (?<message>.*)$"
+			],
+			"type": "string"
+		},
+		"LogLevelsAlternatives": {
+			"type": "object",
+			"description": "Contains alternative log level names which should be matched with our Central Logger levels",
+			"properties": {
+				"Error": {
+					"type": "array"
+				},
+				"Warn": {
+					"type": "array"
+				},
+				"Log": {
+					"type": "array"
+				},
+				"Info": {
+					"type": "array"
+				},
+				"Debug": {
+					"type": "array"
+				},
+				"Verbose": {
+					"type": "array"
+				}
+			}
+		}
+	},
+	"required": [ "FEALogRegexp", "FEACentralLoggerRegexp", "AssimilationRegexp", "NativeLogRegexp", "LogLevelsAlternatives" ]
+}
