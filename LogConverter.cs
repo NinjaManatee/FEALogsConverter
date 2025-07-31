@@ -27,7 +27,7 @@ namespace FeaLogsConverter
 
 		public void Run()
 		{
-			if (!LoadAndValideateConfig()) return;
+			if (!LoadAndValidateConfig()) return;
 
 			ReadLogFiles();
 			SplitCentralLoggerLogs();
@@ -38,7 +38,7 @@ namespace FeaLogsConverter
 			CreateZipArchive();
 		}
 
-		private bool LoadAndValideateConfig()
+		private bool LoadAndValidateConfig()
 		{
 			try
 			{
@@ -129,7 +129,7 @@ namespace FeaLogsConverter
 		{
 			Console.WriteLine($"Reading .log files from: {FolderPath}");
 			string[] logFiles = Directory.GetFiles(FolderPath, "*.log")
-				.Concat(Directory.GetFiles(FolderPath, "assimilationLogs.txt"))
+				.Concat(Directory.GetFiles(FolderPath, "assimilationLogs*.txt"))
 				.Concat(Directory.GetFiles(FolderPath, "*.log.*")
 				.Where(f => int.TryParse(Path.GetExtension(f).TrimStart('.'), out _))) // Ensures it's like ".1", ".2"
 				.ToArray();
@@ -168,7 +168,7 @@ namespace FeaLogsConverter
 
 					if (recordSplitPattern == null)
 					{
-						Console.WriteLine($"Can not determine log reocrd type by first line for: {file} file. The file will be ignored");
+						Console.WriteLine($"Can not determine log record type by first line for: {file} file. The file will be ignored");
 						Console.WriteLine($"{firstLine}");
 						continue;
 					}
@@ -273,11 +273,11 @@ namespace FeaLogsConverter
 			normalizedLogs.AddRange(normalized);
 		}
 
-		private CentralLoggerRecord NormalizeNonCentralLoggerRecord(string record, string regexpPattern, string clientName)
+		private CentralLoggerRecord NormalizeNonCentralLoggerRecord(string record, string regexPattern, string clientName)
 		{
 			try
 			{
-				var pattern = new Regex(regexpPattern, RegexOptions.Compiled);
+				var pattern = new Regex(regexPattern, RegexOptions.Compiled);
 
 				var match = pattern.Match(record);
 
@@ -461,7 +461,7 @@ namespace FeaLogsConverter
 					}
 					else
 					{
-						Console.WriteLine($"Unnable to find {fileName} file");
+						Console.WriteLine($"Unable to find {fileName} file");
 					}
 				}
 			}
