@@ -8,20 +8,21 @@ namespace FeaLogsConverter
 {
 	public class LogConverter
 	{
-		public string FolderPath { get; }
-
+		private string FolderPath { get; }
+		private string OutputPath { get; }
 		private List<string> allLogs = new();
 		private List<string> centralLogs = new();
 		private List<string> otherLogs = new();
 		private List<CentralLoggerRecord> normalizedLogs = new();
 		private Config Config { get; set; }
-
 		private Dictionary<string, string> logLevelsMap;
 
 
 		public LogConverter(string? folderPath)
 		{
 			FolderPath = string.IsNullOrWhiteSpace(folderPath) ? Directory.GetCurrentDirectory() : folderPath;
+			OutputPath = Path.Combine(FolderPath, "output");
+			Directory.CreateDirectory(OutputPath);
 		}
 
 		public void Run()
@@ -41,16 +42,21 @@ namespace FeaLogsConverter
 		{
 			try
 			{
-				Console.WriteLine($"Loading config...");
-
 				// Get the directory of the executable
 				string exeDirectory = Path.GetDirectoryName(Environment.ProcessPath) ?? "";
 
 				string schemaText = File.ReadAllText(Path.Join(exeDirectory, "config.schema.json"));
 				JsonSchema schema = JsonSchema.FromText(schemaText);
 
-				// TODO: Read config from local directory, if it exists, then default to EXE directory
-				string configText = File.ReadAllText(Path.Join(exeDirectory, "config.json"));
+				// Read config from local directory, if it exists, then default to EXE directory
+				var configPath = Path.Join(FolderPath, "config.json");
+				if (!File.Exists(configPath)) 
+				{
+					configPath = Path.Join(exeDirectory, "config.json");
+				}
+
+				Console.WriteLine($"Loading config from {configPath}");
+				string configText = File.ReadAllText(configPath);
 
 				// Remove // comments
 				configText = Regex.Replace(configText, @"//.*", "");
@@ -61,13 +67,13 @@ namespace FeaLogsConverter
 				var result = schema.Evaluate(configNode);
 				if (result != null && !result.IsValid)
 				{
-					Console.WriteLine("❌ Configuration validation failed:");
+					Console.Error.WriteLine("❌ Configuration validation failed:");
 					
 					if (result?.Errors != null)
 					{
 						foreach (var error in result.Errors)
 						{
-							Console.WriteLine($" • {error.Key}: {error.Value}");
+							Console.Error.WriteLine($" • {error.Key}: {error.Value}");
 						}
 					}
 					return false;
@@ -91,7 +97,7 @@ namespace FeaLogsConverter
 			}
 			catch (Exception ex) 
 			{
-				Console.WriteLine($"Load config exception: {ex}");
+				Console.Error.WriteLine($"Load config exception: {ex}");
 				return false;
 			}
 
@@ -139,7 +145,7 @@ namespace FeaLogsConverter
 					bool isCentralLoggerRecord = false;
 
 					string clientName = "FEA";
-					string recordSplitPattern = null;
+					string? recordSplitPattern = null;
 					var firstLine = lines.FirstOrDefault();
 					if (firstLine != null)
 					{
@@ -156,7 +162,7 @@ namespace FeaLogsConverter
 						else if (Regex.IsMatch(firstLine, Config.NativeLogRegexp))
 						{
 							recordSplitPattern = Config.NativeLogRegexp;
-							clientName = Path.GetFileName(file);
+							clientName = Path.GetFileNameWithoutExtension(file);
 						}
 					}
 
@@ -314,7 +320,7 @@ namespace FeaLogsConverter
 
 		private void SaveNonCentralLogs()
 		{
-			string path = Path.Combine(FolderPath, "Not Central Logger.log");
+			string path = Path.Combine(OutputPath, "Not Central Logger.log");
 			File.WriteAllText(path, string.Join(Environment.NewLine + Environment.NewLine, otherLogs));
 			Console.WriteLine($"Other FEA records have been saved into {path}");
 		}
@@ -326,7 +332,7 @@ namespace FeaLogsConverter
 				{ "partial_log", normalizedLogs }
 			};
 
-			string outputFile = Path.Combine(FolderPath, "log0.json");
+			string outputFile = Path.Combine(OutputPath, "log0.json");
 			var options = new JsonSerializerOptions { WriteIndented = true };
 
 			File.WriteAllText(outputFile, JsonSerializer.Serialize(wrapper, options));
@@ -427,7 +433,7 @@ namespace FeaLogsConverter
 				persistState
 			};
 
-			string outputFile = Path.Combine(FolderPath, "log_state.json");
+			string outputFile = Path.Combine(OutputPath, "log_state.json");
 			var options = new JsonSerializerOptions { WriteIndented = true };
 			File.WriteAllText(outputFile, JsonSerializer.Serialize(state, options));
 
@@ -436,7 +442,7 @@ namespace FeaLogsConverter
 
 		void CreateZipArchive()
 		{
-			string zipFilePath = Path.Combine(Directory.GetCurrentDirectory(), "FEA.CentralLogger.zip");
+			string zipFilePath = Path.Combine(OutputPath, "FEA.CentralLogger.zip");
 
 			// Delete if it already exists to avoid errors
 			if (File.Exists(zipFilePath)) File.Delete(zipFilePath);
@@ -447,7 +453,7 @@ namespace FeaLogsConverter
 
 				foreach (var fileName in filesToInclude)
 				{
-					string fullPath = Path.Combine(Directory.GetCurrentDirectory(), fileName);
+					string fullPath = Path.Combine(OutputPath, fileName);
 					if (File.Exists(fullPath))
 					{
 						zip.CreateEntryFromFile(fullPath, fileName);
