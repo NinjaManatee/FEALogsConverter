@@ -42,10 +42,15 @@ namespace FeaLogsConverter
 			try
 			{
 				Console.WriteLine($"Loading config...");
-				string schemaText = File.ReadAllText("config.schema.json");
+
+				// Get the directory of the executable
+				string exeDirectory = Path.GetDirectoryName(Environment.ProcessPath) ?? "";
+
+				string schemaText = File.ReadAllText(Path.Join(exeDirectory, "config.schema.json"));
 				JsonSchema schema = JsonSchema.FromText(schemaText);
 
-				string configText = File.ReadAllText("config.json");
+				// TODO: Read config from local directory, if it exists, then default to EXE directory
+				string configText = File.ReadAllText(Path.Join(exeDirectory, "config.json"));
 
 				// Remove // comments
 				configText = Regex.Replace(configText, @"//.*", "");
