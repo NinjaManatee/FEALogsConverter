@@ -129,7 +129,7 @@ namespace FeaLogsConverter
 		{
 			Console.WriteLine($"Reading log files from: {FolderPath}");
 			string[] logFiles = Directory.GetFiles(FolderPath, "*.log")
-				.Concat(Directory.GetFiles(FolderPath, "assimilationLogs*.txt"))
+				.Concat(Directory.GetFiles(FolderPath, "*.txt"))
 				.Concat(Directory.GetFiles(FolderPath, "*.log.*")
 				.Where(f => int.TryParse(Path.GetExtension(f).TrimStart('.'), out _))) // Ensures it's like ".1", ".2"
 				.ToArray();
