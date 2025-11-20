@@ -330,6 +330,9 @@ namespace FeaLogsConverter
 
 		private void SaveNormalizedLogJson()
 		{
+			// sort by timestamp to get logs in order
+			normalizedLogs.Sort((a, b) => a.timeElapsedFromStartup.CompareTo(b.timeElapsedFromStartup));
+
 			var wrapper = new Dictionary<string, object>
 			{
 				{ "partial_log", normalizedLogs }
