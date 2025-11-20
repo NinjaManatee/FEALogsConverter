@@ -448,7 +448,9 @@ namespace FeaLogsConverter
 
 		void CreateZipArchive()
 		{
-			string zipFilePath = Path.Combine(OutputPath, "FEA.CentralLogger.zip");
+			string dirName = Path.GetFileName(FolderPath) ?? "FEA.CentralLogger";
+			string exportFilename = $"{dirName}-CentralLogger.zip";
+			string zipFilePath = Path.Combine(OutputPath, exportFilename);
 
 			// Delete if it already exists to avoid errors
 			if (File.Exists(zipFilePath)) File.Delete(zipFilePath);
@@ -472,7 +474,7 @@ namespace FeaLogsConverter
 				}
 			}
 
-			Console.WriteLine("FEA.CentralLogger.zip created");
+			Console.WriteLine($"{exportFilename} created");
 		}
 	}
 }
